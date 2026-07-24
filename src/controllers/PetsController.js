@@ -7,7 +7,7 @@ module.exports = {
 
             const pets = await connection('pets')
                 .where('tutEmpId', empresaId)
-                .join('empresas', 'empresas.empCpfCnpj','pets.petEmpId')
+                .join('empresas', 'empresas.empId','pets.petEmpId')
                 .join('especies', 'especies.espId','pets.petEspId')
                 .join('racas', 'racas.racId','pets.petRacId')
                 .join('tutores', 'tutores.tutId','pets.petTutId')

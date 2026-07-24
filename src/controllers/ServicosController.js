@@ -7,7 +7,7 @@ module.exports = {
 
             const servicos = await connection('servicos')
                 .where('serEmpId', empresaId)
-                .join('empresas', 'empresas.empCpfCnpj','servicos.serEmpId')
+                .join('empresas', 'empresas.empId','servicos.serEmpId')
                 .select(
                     'servicos.*',
                     'empresas.empNomFantasia'

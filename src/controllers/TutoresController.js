@@ -3,15 +3,18 @@ const connection = require('../database/connection');
 module.exports = {      
     async index(request, response) {
         const empresaId = request.headers.empresaid;
+        console.log('empressa:', empresaId)
         try {
 
             const tutores = await connection('tutores')
                 .where('tutEmpId', empresaId)
-                .join('empresas', 'empresas.empCpfCnpj','tutores.tutEmpId')
+                .join('empresas', 'empresas.empId','tutores.tutEmpId')
                 .select(
                     'tutores.*',
                     'empresas.empNomFantasia'
                 );
+
+                console.log(tutores);
 
             return response.json(tutores);
 
