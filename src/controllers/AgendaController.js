@@ -2,44 +2,126 @@ const connection = require('../database/connection');
 
 module.exports = {      
     async index(request, response) {
-        const agenda = await connection('agenda')
-            .select('*');
-          
-        if (!agenda) {
-            return response.status(400).json({ error: 'Não encontrou agenda cadastrada!'});
-        } 
+        const empresaId = request.headers.empresaid;
+        try {
 
-        return response.json(agenda);
+            const agendamentos = await connection('agendamentos')
+                .where('ageEmpId', empresaId)
+                .join('empresas', 'empresas.empId','agendamentos.ageEmpId')
+                .select(
+                    'agendamentos.*',
+                    'empresas.empNomFantasia'
+                );
+
+            return response.json(agendamentos);
+
+
+        } catch (error) {
+            console.error(error);
+            return response.status(500).json({
+                message: error.message,
+                stack: error.stack
+            });
+        }
     },
     
     async newagenda(request, response) {
+        const empresaId = request.headers.empresaid;
         console.log(request.body);
-        const {tipo, resp, data, hora, petId, descricao} = request.body;
-        let status = 'A'; 
-        const [ageId] = await connection('agenda').insert({
-            ageTip: tipo, 
-            ageResId: resp,
-            ageData: data, 
-            ageHora: hora,
-            agePetId: petId,
-            ageDescricao: descricao,
-            ageStatus: status  
+        const {agePetId,
+            ageTutId,
+            ageFunId,
+            ageRecId,
+            ageSerId,
+            ageData,
+            ageHoraInicio,
+            ageHoraFim,
+            ageStatus,
+            ageValor,
+            ageObservacao} = request.body;
+        const [ageId] = await connection('agendamentos').insert({
+            agePetId,
+            ageTutId,
+            ageFunId,
+            ageRecId,
+            ageSerId,
+            ageData,
+            ageHoraInicio,
+            ageHoraFim,
+            ageStatus,
+            ageValor,
+            ageObservacao
         });
            
         return response.json({ageId});
     },
 
-    async ageSearch(request, response) {
-        const pet = request.body;
-        const agenda = await connection('agenda')
-            .where('agePetId', pet)
-            .select('*');
-          
-        if (!agenda) {
-            return response.status(400).json({ error: 'Não encontrou agenda com este ID!'});
-        } 
+    async show(request, response) {
+        const { id } = request.params;
+        const empresaId = request.headers.empresaid;
 
-        return response.json(agenda);
+        const agendamento = await connection("agendamentos")
+            .where('ageEmpId', empresaId)
+            .where("ageId", id)
+            .first();
+
+        if (!agendamento) {
+            return response.status(404).json({
+                error: "Agendamento não encontrado."
+            });
+        }
+
+        return response.json(agendamento);
+
     },
 
+    async update(request, response) {
+        const { id } = request.params;
+        const {
+            agePetId,
+            ageTutId,
+            ageFunId,
+            ageRecId,
+            ageSerId,
+            ageData,
+            ageHoraInicio,
+            ageHoraFim,
+            ageStatus,
+            ageValor,
+            ageObservacao} = request.body;
+        const empresaId = request.headers.empresaid;
+
+        const agendamento = await connection("agendamentos")
+            .where('ageEmpId', empresaId)    
+            .where("ageId", id)
+            .first();
+
+        if (!agendamento) {
+            return response.status(404).json({
+                error: "Agendamento não encontrado."
+            });
+        }
+
+        await connection("agendamentos")
+            .where('ageEmpId', empresaId)
+            .where("ageId", id)
+            .update({
+                agePetId,
+                ageTutId,
+                ageFunId,
+                ageRecId,
+                ageSerId,
+                ageData,
+                ageHoraInicio,
+                ageHoraFim,
+                ageStatus,
+                ageValor,
+                ageObservacao
+            });
+
+        return response.json({
+            success: true,
+            message: "Agendamento atualizado com sucesso."
+        });
+    },
 }

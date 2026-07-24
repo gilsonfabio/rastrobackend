@@ -14,7 +14,7 @@ module.exports = {
 
         const usuario = await connection('users')
             .where('usrEmail', email) 
-            .select(`usrId`, `usrNome`, `usrEmail`, `usrPassword`, `usrEmpCnpj`, `usrPerfil`, `usrAvatar`)
+            .select(`usrId`, `usrNome`, `usrEmail`, `usrPassword`, `usrEmpId`, `usrPerfil`, `usrAvatar`)
             .first();
         
         if (!usuario) {            
@@ -35,7 +35,7 @@ module.exports = {
             email: usuario.usrEmail,
             perfil: usuario.usrPerfil,
             avatar: usuario.usrAvatar,
-            empresaId: usuario.usrEmpCnpj,
+            empresaId: usuario.usrEmpId,
         }
 
         //let token = jwt.sign({ id: user.usrId, name: user.usrNome, email: user.usrEmail, nivel: user.usrNivAcesso }, process.env.SECRET_JWT, {

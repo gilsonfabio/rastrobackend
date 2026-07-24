@@ -6,17 +6,16 @@ require("dotenv/config");
 
 const app = express();
 
-// CORS e headers
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "X-PINGOTHER, Content-Type, Authorization"
-  );
-  app.use(cors());
-  next();
-});
+app.use(cors({
+  origin: "http://localhost:3000",
+  credentials: true,
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "empresaId"
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+}));
 
 app.use(express.json());
 app.use(routes);
@@ -24,6 +23,7 @@ app.use(routes);
 const server = http.createServer(app);
 
 const port = process.env.PORT || 3333;
+
 server.listen(port, () => {
-  console.info(`Servidor rodando na porta ${port}...`);
+  console.log(`Servidor rodando na porta ${port}...`);
 });
